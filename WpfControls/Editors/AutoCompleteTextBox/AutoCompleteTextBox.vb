@@ -20,7 +20,7 @@ Public Class AutoCompleteTextBox
     Public Shared ReadOnly IsReadOnlyProperty As DependencyProperty = DependencyProperty.Register("IsReadOnly", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly ItemTemplateProperty As DependencyProperty = DependencyProperty.Register("ItemTemplate", GetType(DataTemplate), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
     Public Shared ReadOnly ProviderProperty As DependencyProperty = DependencyProperty.Register("Provider", GetType(ISuggestionProvider), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
-    Public Shared ReadOnly SelectedItemProperty As DependencyProperty = DependencyProperty.Register("SelectedItem", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
+    Public Shared ReadOnly SelectedItemProperty As DependencyProperty = DependencyProperty.Register("SelectedItem", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing, AddressOf OnSelectedItemChanged))
     Public Shared ReadOnly TextProperty As DependencyProperty = DependencyProperty.Register("Text", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
 
     Private _bindingEvaluator As BindingEvaluator
@@ -212,7 +212,13 @@ Public Class AutoCompleteTextBox
             AddHandler Editor.TextChanged, AddressOf OnEditroTextChanged
             AddHandler Editor.PreviewKeyDown, AddressOf OnEditorKeyDown
             AddHandler Editor.LostFocus, AddressOf OnEditorLostFocus
+
+            If SelectedItem IsNot Nothing Then
+                Editor.Text = BindingEvaluator.Evaluate(SelectedItem)
+            End If
+
         End If
+
         If Popup IsNot Nothing Then
             Popup.StaysOpen = False
             AddHandler Popup.Opened, AddressOf OnPopupOpened
@@ -246,7 +252,9 @@ Public Class AutoCompleteTextBox
     End Sub
 
     Private Sub OnEditorLostFocus(ByVal sender As Object, ByVal e As RoutedEventArgs)
-        IsDropDownOpen = False
+        If Not IsKeyboardFocusWithin Then
+            IsDropDownOpen = False
+        End If
     End Sub
 
     Private Sub OnEditroTextChanged(ByVal sender As Object, ByVal e As TextChangedEventArgs)
@@ -309,6 +317,18 @@ Public Class AutoCompleteTextBox
         Editor.SelectionStart = Editor.Text.Length
         Editor.SelectionLength = 0
         _isUpdatingText = False
+    End Sub
+
+    Shared Sub OnSelectedItemChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim act As AutoCompleteTextBox
+        act = TryCast(d, AutoCompleteTextBox)
+        If act IsNot Nothing Then
+            If act.Editor IsNot Nothing Then
+                act._isUpdatingText = True
+                act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue)
+                act._isUpdatingText = False
+            End If
+        End If
     End Sub
 
 #End Region 'Methods

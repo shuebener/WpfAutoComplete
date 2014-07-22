@@ -1,23 +1,31 @@
 ﻿Imports System.ComponentModel
+Imports System.IO
 
 Public Class MainWindowViewModel
     Implements INotifyPropertyChanged
 
-    #Region "Fields"
+#Region "Fields"
 
     Private _cancelCommand As ICommand
     Private _fileName As String
     Private _openCommand As ICommand
+    Private _selectedPath As FileSystemInfo
 
-    #End Region 'Fields
+#End Region 'Fields
 
-    #Region "Events"
+#Region "Constructor"
+    Public Sub New()
+        SelectedPath = New DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))
+    End Sub
+#End Region
+
+#Region "Events"
 
     Public Event PropertyChanged(ByVal sender As Object, ByVal e As System.ComponentModel.PropertyChangedEventArgs) Implements System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 
-    #End Region 'Events
+#End Region 'Events
 
-    #Region "Properties"
+#Region "Properties"
 
     Public ReadOnly Property CancelCommand() As ICommand
         Get
@@ -37,6 +45,15 @@ Public Class MainWindowViewModel
         End Set
     End Property
 
+    Public Property SelectedPath() As FileSystemInfo
+        Get
+            Return _selectedPath
+        End Get
+        Set(ByVal value As FileSystemInfo)
+            _selectedPath = value
+        End Set
+    End Property
+
     Public ReadOnly Property OpenCommand() As ICommand
         Get
             If _openCommand Is Nothing Then
@@ -46,9 +63,9 @@ Public Class MainWindowViewModel
         End Get
     End Property
 
-    #End Region 'Properties
+#End Region 'Properties
 
-    #Region "Methods"
+#Region "Methods"
 
     Protected Overridable Sub RaisePropertyChanged(ByVal propertyName As String)
         RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(propertyName))
@@ -60,13 +77,13 @@ Public Class MainWindowViewModel
 
     Private Sub ExecuteOpenCommand(ByVal param As Object)
         Try
-            Process.Start(FileName)
+            Process.Start(SelectedPath.FullName)
             Application.Current.Shutdown()
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
     End Sub
 
-    #End Region 'Methods
+#End Region 'Methods
 
 End Class

@@ -13,7 +13,6 @@
 
     Public Sub New(ByVal binding As Binding)
         ValueBinding = binding
-        SetBinding(ValueProperty, binding)
     End Sub
 
     #End Region 'Constructors
@@ -45,6 +44,7 @@
 
     Public Function Evaluate(ByVal dataItem As Object) As String
         Me.DataContext = dataItem
+        SetBinding(ValueProperty, ValueBinding)
         Return Value
     End Function
 

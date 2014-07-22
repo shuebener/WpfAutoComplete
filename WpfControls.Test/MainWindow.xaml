@@ -29,7 +29,7 @@
         <wpf:AutoCompleteTextBox VerticalAlignment="Top"
                                  Height="25"
                                  Grid.Column="1"
-                                 Text="{Binding Path=FileName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 SelectedItem="{Binding Path=SelectedPath, Mode=TwoWay}"
                                  DisplayMember="FullName"
                                  ItemTemplate="{StaticResource ResourceKey=fsTemplate}"
                                  Provider="{StaticResource ResourceKey=fsp}"></wpf:AutoCompleteTextBox>
