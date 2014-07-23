@@ -32,6 +32,7 @@
                                  SelectedItem="{Binding Path=SelectedPath, Mode=TwoWay}"
                                  DisplayMember="FullName"
                                  ItemTemplate="{StaticResource ResourceKey=fsTemplate}"
+                                 Watermark="Search here"
                                  Provider="{StaticResource ResourceKey=fsp}"></wpf:AutoCompleteTextBox>
         <StackPanel Grid.Column="1"
                     Grid.Row="1"

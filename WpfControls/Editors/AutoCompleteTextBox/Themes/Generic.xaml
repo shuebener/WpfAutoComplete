@@ -2,53 +2,110 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:WpfControls">
 
-    
-    <Style TargetType="ListBoxItem" x:Key="SuggestionItemStyle">
+
+    <Style TargetType="ListBoxItem"
+           x:Key="SuggestionItemStyle">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="ContentBorder" 
+                    <Border x:Name="ContentBorder"
                             Background="White">
-                        <ContentPresenter/>
+                        <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" TargetName="ContentBorder" Value="{x:Static SystemColors.HighlightBrush}"/>
-                            <Setter Property="IsSelected" Value="True"/>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    TargetName="ContentBorder"
+                                    Value="{x:Static SystemColors.HighlightBrush}" />
+                            <Setter Property="IsSelected"
+                                    Value="True" />
                         </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" TargetName="ContentBorder" Value="{x:Static SystemColors.HighlightBrush}"/>
+                        <Trigger Property="IsSelected"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    TargetName="ContentBorder"
+                                    Value="{x:Static SystemColors.HighlightBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style TargetType="{x:Type TextBox}"
+           x:Key="TransparentTextBoxStyle">
+        <Setter Property="FocusVisualStyle"
+                Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Grid>
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Background="Transparent"
+                                      Focusable="True"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type local:AutoCompleteTextBox}">
         <Setter Property="Focusable"
                 Value="False" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="BorderBrush"
+                Value="Gray" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:AutoCompleteTextBox}">
                     <Border BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            Background="{TemplateBinding Background}">
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="3">
                         <Grid>
+                            <TextBlock x:Name="PART_Watermark"
+                                       Text="{TemplateBinding Watermark}"
+                                       Visibility="Collapsed"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       Focusable="False"
+                                       Foreground="Gray"
+                                       Margin="3,0" />
                             <TextBox x:Name="PART_Editor"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Center"
+                                     Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
                                      Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
+
                             <Popup x:Name="PART_Popup"
                                    IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource Mode=TemplatedParent},Mode=TwoWay}"
                                    Width="{TemplateBinding ActualWidth}"
+                                   HorizontalOffset="0"
                                    Focusable="False">
-                                <ListBox x:Name="PART_Selector" 
-                                         ItemTemplate="{TemplateBinding ItemTemplate}" 
+                                <Popup.Effect>
+                                    <DropShadowEffect />
+                                </Popup.Effect>
+                                <ListBox x:Name="PART_Selector"
+                                         ItemTemplate="{TemplateBinding ItemTemplate}"
                                          Focusable="False"
                                          ItemContainerStyle="{StaticResource ResourceKey=SuggestionItemStyle}">
                                 </ListBox>
                             </Popup>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text"
+                                 Value=""
+                                 SourceName="PART_Editor">
+                            <Setter Property="Visibility"
+                                    Value="Visible"
+                                    TargetName="PART_Watermark" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

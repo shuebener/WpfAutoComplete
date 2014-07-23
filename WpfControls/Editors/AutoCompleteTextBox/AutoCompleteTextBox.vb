@@ -44,6 +44,21 @@ Public Class AutoCompleteTextBox
 
 #Region "Properties"
 
+    Public Property Watermark As String
+        Get
+            Return GetValue(WatermarkProperty)
+        End Get
+
+        Set(ByVal value As String)
+            SetValue(WatermarkProperty, value)
+        End Set
+    End Property
+
+    Public Shared ReadOnly WatermarkProperty As DependencyProperty = _
+                           DependencyProperty.Register("Watermark", _
+                           GetType(String), GetType(AutoCompleteTextBox), _
+                           New FrameworkPropertyMetadata(String.Empty))
+
     Public Property BindingEvaluator() As BindingEvaluator
         Get
             Return _bindingEvaluator
