@@ -1,4 +1,5 @@
-﻿Imports System.Windows.Controls.Primitives
+﻿Imports System.Threading
+Imports System.Windows.Controls.Primitives
 Imports System.Windows.Threading
 
 <TemplatePart(Name:=AutoCompleteTextBox.PartEditor, Type:=GetType(TextBox))> _
@@ -17,7 +18,6 @@ Public Class AutoCompleteTextBox
     Public Shared ReadOnly DisplayMemberProperty As DependencyProperty = DependencyProperty.Register("DisplayMember", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
     Public Shared ReadOnly IsDropDownOpenProperty As DependencyProperty = DependencyProperty.Register("IsDropDownOpen", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsLoadingProperty As DependencyProperty = DependencyProperty.Register("IsLoading", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
-    Public Shared ReadOnly IsPopulatingProperty As DependencyProperty = DependencyProperty.Register("IsPopulating", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsReadOnlyProperty As DependencyProperty = DependencyProperty.Register("IsReadOnly", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly ItemTemplateProperty As DependencyProperty = DependencyProperty.Register("ItemTemplate", GetType(DataTemplate), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
     Public Shared ReadOnly LoadingContentProperty As DependencyProperty = DependencyProperty.Register("LoadingContent", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
@@ -34,6 +34,7 @@ Public Class AutoCompleteTextBox
     Private _itemsSelector As Selector
     Private _popup As Popup
     Private _selectionAdapter As SelectionAdapter
+    Private _suggestionsAdapter As SuggestionsAdapter
 
 #End Region 'Fields
 
@@ -120,16 +121,6 @@ Public Class AutoCompleteTextBox
 
         Set(ByVal value As Boolean)
             SetValue(IsLoadingProperty, value)
-        End Set
-    End Property
-
-    Public Property IsPopulating() As Boolean
-        Get
-            Return GetValue(IsPopulatingProperty)
-        End Get
-
-        Set(ByVal value As Boolean)
-            SetValue(IsPopulatingProperty, value)
         End Set
     End Property
 
@@ -327,14 +318,10 @@ Public Class AutoCompleteTextBox
         FetchTimer.Stop()
         If Provider IsNot Nothing AndAlso ItemsSelector IsNot Nothing Then
             Filter = Editor.Text
-            ItemsSelector.ItemsSource = Provider.GetSuggestions(Editor.Text)
-            ItemsSelector.SelectedIndex = -1
-            IsLoading = False
-            If ItemsSelector.HasItems AndAlso IsKeyboardFocusWithin Then
-                IsDropDownOpen = True
-            Else
-                IsDropDownOpen = False
+            If _suggestionsAdapter Is Nothing Then
+                _suggestionsAdapter = New SuggestionsAdapter(Me)
             End If
+            _suggestionsAdapter.GetSuggestions(Filter)
         End If
     End Sub
 
@@ -369,5 +356,57 @@ Public Class AutoCompleteTextBox
     End Sub
 
 #End Region 'Methods
+
+#Region "Nested Types"
+
+    Private Class SuggestionsAdapter
+
+#Region "Fields"
+
+        Private _actb As AutoCompleteTextBox
+        Private _filter As String
+
+#End Region 'Fields
+
+#Region "Constructors"
+
+        Public Sub New(ByVal actb As AutoCompleteTextBox)
+            _actb = actb
+        End Sub
+
+#End Region 'Constructors
+
+#Region "Methods"
+
+        Public Sub GetSuggestions(ByVal searchText As String)
+            _filter = searchText
+            _actb.IsLoading = True
+            Dim thInfo As ParameterizedThreadStart = New ParameterizedThreadStart(AddressOf GetSuggestionsAsync)
+            Dim th As New Thread(thInfo)
+            th.Start(New Object() {searchText, _actb.Provider})
+        End Sub
+
+        Private Sub DisplaySuggestions(ByVal suggestions As IEnumerable, ByVal filter As String)
+            If _filter <> filter Then
+                Return
+            End If
+            _actb.IsLoading = False
+            _actb.ItemsSelector.ItemsSource = suggestions
+            _actb.IsDropDownOpen = _actb.ItemsSelector.HasItems
+        End Sub
+
+        Private Sub GetSuggestionsAsync(ByVal param As Object)
+            Dim args As Object() = param
+            Dim searchText As String = args(0)
+            Dim provider As ISuggestionProvider = args(1)
+            Dim list As IEnumerable = provider.GetSuggestions(searchText)
+            _actb.Dispatcher.BeginInvoke(New Action(Of IEnumerable, String)(AddressOf DisplaySuggestions), DispatcherPriority.Background, New Object() {list, searchText})
+        End Sub
+
+#End Region 'Methods
+
+    End Class
+
+#End Region 'Nested Types
 
 End Class
