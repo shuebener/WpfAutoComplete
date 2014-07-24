@@ -16,12 +16,15 @@ Public Class AutoCompleteTextBox
     Public Shared ReadOnly DelayProperty As DependencyProperty = DependencyProperty.Register("Delay", GetType(Integer), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(200))
     Public Shared ReadOnly DisplayMemberProperty As DependencyProperty = DependencyProperty.Register("DisplayMember", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
     Public Shared ReadOnly IsDropDownOpenProperty As DependencyProperty = DependencyProperty.Register("IsDropDownOpen", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
+    Public Shared ReadOnly IsLoadingProperty As DependencyProperty = DependencyProperty.Register("IsLoading", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsPopulatingProperty As DependencyProperty = DependencyProperty.Register("IsPopulating", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsReadOnlyProperty As DependencyProperty = DependencyProperty.Register("IsReadOnly", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly ItemTemplateProperty As DependencyProperty = DependencyProperty.Register("ItemTemplate", GetType(DataTemplate), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
+    Public Shared ReadOnly LoadingContentProperty As DependencyProperty = DependencyProperty.Register("LoadingContent", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
     Public Shared ReadOnly ProviderProperty As DependencyProperty = DependencyProperty.Register("Provider", GetType(ISuggestionProvider), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
     Public Shared ReadOnly SelectedItemProperty As DependencyProperty = DependencyProperty.Register("SelectedItem", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing, AddressOf OnSelectedItemChanged))
     Public Shared ReadOnly TextProperty As DependencyProperty = DependencyProperty.Register("Text", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
+    Public Shared ReadOnly WatermarkProperty As DependencyProperty = DependencyProperty.Register("Watermark", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
 
     Private _bindingEvaluator As BindingEvaluator
     Private _editor As TextBox
@@ -43,21 +46,6 @@ Public Class AutoCompleteTextBox
 #End Region 'Constructors
 
 #Region "Properties"
-
-    Public Property Watermark As String
-        Get
-            Return GetValue(WatermarkProperty)
-        End Get
-
-        Set(ByVal value As String)
-            SetValue(WatermarkProperty, value)
-        End Set
-    End Property
-
-    Public Shared ReadOnly WatermarkProperty As DependencyProperty = _
-                           DependencyProperty.Register("Watermark", _
-                           GetType(String), GetType(AutoCompleteTextBox), _
-                           New FrameworkPropertyMetadata(String.Empty))
 
     Public Property BindingEvaluator() As BindingEvaluator
         Get
@@ -125,6 +113,16 @@ Public Class AutoCompleteTextBox
         End Set
     End Property
 
+    Public Property IsLoading() As Boolean
+        Get
+            Return GetValue(IsLoadingProperty)
+        End Get
+
+        Set(ByVal value As Boolean)
+            SetValue(IsLoadingProperty, value)
+        End Set
+    End Property
+
     Public Property IsPopulating() As Boolean
         Get
             Return GetValue(IsPopulatingProperty)
@@ -161,6 +159,16 @@ Public Class AutoCompleteTextBox
 
         Set(ByVal value As DataTemplate)
             SetValue(ItemTemplateProperty, value)
+        End Set
+    End Property
+
+    Public Property LoadingContent() As Object
+        Get
+            Return GetValue(LoadingContentProperty)
+        End Get
+
+        Set(ByVal value As Object)
+            SetValue(LoadingContentProperty, value)
         End Set
     End Property
 
@@ -212,6 +220,16 @@ Public Class AutoCompleteTextBox
         End Set
     End Property
 
+    Public Property Watermark() As String
+        Get
+            Return GetValue(WatermarkProperty)
+        End Get
+
+        Set(ByVal value As String)
+            SetValue(WatermarkProperty, value)
+        End Set
+    End Property
+
 #End Region 'Properties
 
 #Region "Methods"
@@ -224,7 +242,7 @@ Public Class AutoCompleteTextBox
         BindingEvaluator = New BindingEvaluator(New Binding(DisplayMember))
 
         If Editor IsNot Nothing Then
-            AddHandler Editor.TextChanged, AddressOf OnEditroTextChanged
+            AddHandler Editor.TextChanged, AddressOf OnEditorTextChanged
             AddHandler Editor.PreviewKeyDown, AddressOf OnEditorKeyDown
             AddHandler Editor.LostFocus, AddressOf OnEditorLostFocus
 
@@ -244,6 +262,18 @@ Public Class AutoCompleteTextBox
             AddHandler SelectionAdapter.Commit, AddressOf OnSelectionAdapterCommit
             AddHandler SelectionAdapter.Cancel, AddressOf OnSelectionAdapterCancel
             AddHandler SelectionAdapter.SelectionChanged, AddressOf OnSelectionAdapterSelectionChanged
+        End If
+    End Sub
+
+    Shared Sub OnSelectedItemChanged(ByVal d As DependencyObject, ByVal e As DependencyPropertyChangedEventArgs)
+        Dim act As AutoCompleteTextBox
+        act = TryCast(d, AutoCompleteTextBox)
+        If act IsNot Nothing Then
+            If act.Editor IsNot Nothing Then
+                act._isUpdatingText = True
+                act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue)
+                act._isUpdatingText = False
+            End If
         End If
     End Sub
 
@@ -272,7 +302,7 @@ Public Class AutoCompleteTextBox
         End If
     End Sub
 
-    Private Sub OnEditroTextChanged(ByVal sender As Object, ByVal e As TextChangedEventArgs)
+    Private Sub OnEditorTextChanged(ByVal sender As Object, ByVal e As TextChangedEventArgs)
         If _isUpdatingText Then Return
         If FetchTimer Is Nothing Then
             FetchTimer = New DispatcherTimer
@@ -282,6 +312,9 @@ Public Class AutoCompleteTextBox
         FetchTimer.IsEnabled = False
         FetchTimer.Stop()
         If Editor.Text.Length > 0 Then
+            IsLoading = True
+            IsDropDownOpen = True
+            ItemsSelector.ItemsSource = Nothing
             FetchTimer.IsEnabled = True
             FetchTimer.Start()
         Else
@@ -296,6 +329,7 @@ Public Class AutoCompleteTextBox
             Filter = Editor.Text
             ItemsSelector.ItemsSource = Provider.GetSuggestions(Editor.Text)
             ItemsSelector.SelectedIndex = -1
+            IsLoading = False
             If ItemsSelector.HasItems AndAlso IsKeyboardFocusWithin Then
                 IsDropDownOpen = True
             Else
@@ -332,18 +366,6 @@ Public Class AutoCompleteTextBox
         Editor.SelectionStart = Editor.Text.Length
         Editor.SelectionLength = 0
         _isUpdatingText = False
-    End Sub
-
-    Shared Sub OnSelectedItemChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
-        Dim act As AutoCompleteTextBox
-        act = TryCast(d, AutoCompleteTextBox)
-        If act IsNot Nothing Then
-            If act.Editor IsNot Nothing Then
-                act._isUpdatingText = True
-                act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue)
-                act._isUpdatingText = False
-            End If
-        End If
     End Sub
 
 #End Region 'Methods
