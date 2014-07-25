@@ -16,6 +16,9 @@ Public Class AutoCompleteTextBox
 
     Public Shared ReadOnly DelayProperty As DependencyProperty = DependencyProperty.Register("Delay", GetType(Integer), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(200))
     Public Shared ReadOnly DisplayMemberProperty As DependencyProperty = DependencyProperty.Register("DisplayMember", GetType(String), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(String.Empty))
+    Public Shared ReadOnly IconPlacementProperty As DependencyProperty = DependencyProperty.Register("IconPlacement", GetType(IconPlacement), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(IconPlacement.Left))
+    Public Shared ReadOnly IconProperty As DependencyProperty = DependencyProperty.Register("Icon", GetType(Object), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Nothing))
+    Public Shared ReadOnly IconVisibilityProperty As DependencyProperty = DependencyProperty.Register("IconVisibility", GetType(Visibility), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(Visibility.Visible))
     Public Shared ReadOnly IsDropDownOpenProperty As DependencyProperty = DependencyProperty.Register("IsDropDownOpen", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsLoadingProperty As DependencyProperty = DependencyProperty.Register("IsLoading", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
     Public Shared ReadOnly IsReadOnlyProperty As DependencyProperty = DependencyProperty.Register("IsReadOnly", GetType(Boolean), GetType(AutoCompleteTextBox), New FrameworkPropertyMetadata(False))
@@ -101,6 +104,36 @@ Public Class AutoCompleteTextBox
         End Get
         Set(ByVal value As String)
             _filter = value
+        End Set
+    End Property
+
+    Public Property Icon() As Object
+        Get
+            Return GetValue(IconProperty)
+        End Get
+
+        Set(ByVal value As Object)
+            SetValue(IconProperty, value)
+        End Set
+    End Property
+
+    Public Property IconPlacement() As IconPlacement
+        Get
+            Return GetValue(IconPlacementProperty)
+        End Get
+
+        Set(ByVal value As IconPlacement)
+            SetValue(IconPlacementProperty, value)
+        End Set
+    End Property
+
+    Public Property IconVisibility() As Visibility
+        Get
+            Return GetValue(IconVisibilityProperty)
+        End Get
+
+        Set(ByVal value As Visibility)
+            SetValue(IconVisibilityProperty, value)
         End Set
     End Property
 

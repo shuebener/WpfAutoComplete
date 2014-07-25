@@ -39,12 +39,24 @@
                                  DisplayMember="FullName"
                                  ItemTemplate="{StaticResource ResourceKey=fsTemplate}"
                                  Watermark="Search here"
+                                 IconPlacement="Left"
+                                 IconVisibility="Visible"
                                  Provider="{StaticResource ResourceKey=fsp}">
             <wpf:AutoCompleteTextBox.LoadingContent>
                 <TextBlock Text="Loading..."
                            Margin="5"
                            FontSize="14" />
             </wpf:AutoCompleteTextBox.LoadingContent>
+            <wpf:AutoCompleteTextBox.Icon>
+                <Border Width="20"
+                        Height="20">
+                    <TextBlock Text="🔍"
+                               FontSize="14"
+                               FontFamily="Segoe UI Symbol"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+            </wpf:AutoCompleteTextBox.Icon>
         </wpf:AutoCompleteTextBox>
         <StackPanel Grid.Column="1"
                     Grid.Row="1"

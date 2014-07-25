@@ -68,20 +68,26 @@
                             Background="{TemplateBinding Background}"
                             CornerRadius="3">
                         <Grid>
-                            <TextBlock x:Name="PART_Watermark"
-                                       Text="{TemplateBinding Watermark}"
-                                       Visibility="Collapsed"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left"
-                                       Focusable="False"
-                                       Foreground="Gray"
-                                       Margin="3,0" />
-                            <TextBox x:Name="PART_Editor"
-                                     HorizontalAlignment="Stretch"
-                                     VerticalAlignment="Center"
-                                     Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
-                                     Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
-
+                            <DockPanel>
+                                <ContentPresenter ContentSource="Icon"
+                                                  x:Name="PART_Icon"
+                                                  Visibility="{TemplateBinding IconVisibility}" />
+                                <Grid>
+                                    <TextBlock x:Name="PART_Watermark"
+                                               Text="{TemplateBinding Watermark}"
+                                               Visibility="Collapsed"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Left"
+                                               Focusable="False"
+                                               Foreground="Gray"
+                                               Margin="3,0" />
+                                    <TextBox x:Name="PART_Editor"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Center"
+                                             Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
+                                             Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
+                                </Grid>
+                            </DockPanel>
                             <Popup x:Name="PART_Popup"
                                    IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource Mode=TemplatedParent},Mode=TwoWay}"
                                    Width="{TemplateBinding ActualWidth}"
@@ -118,6 +124,18 @@
                             <Setter Property="Visibility"
                                     Value="Visible"
                                     TargetName="PART_Watermark" />
+                        </Trigger>
+                        <Trigger Property="IconPlacement"
+                                 Value="Left">
+                            <Setter Property="DockPanel.Dock"
+                                    Value="Left"
+                                    TargetName="PART_Icon" />
+                        </Trigger>
+                        <Trigger Property="IconPlacement"
+                                 Value="Right">
+                            <Setter Property="DockPanel.Dock"
+                                    Value="Right"
+                                    TargetName="PART_Icon" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
