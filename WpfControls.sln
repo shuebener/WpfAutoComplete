@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WpfControls", "WpfControls\WpfControls.vbproj", "{D010F52C-140C-410D-B897-C1091B81AA13}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WpfControls.Test", "WpfControls.Test\WpfControls.Test.vbproj", "{39F20FE4-26BC-455C-A3FE-9031820C9897}"

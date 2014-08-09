@@ -23,6 +23,7 @@
         End If
         Dim dirInfo As IO.DirectoryInfo = New IO.DirectoryInfo(dirPath)
         lst.AddRange(dirInfo.GetFileSystemInfos(dirFilter))
+        System.Threading.Thread.Sleep(2000)
         Return lst
     End Function
 

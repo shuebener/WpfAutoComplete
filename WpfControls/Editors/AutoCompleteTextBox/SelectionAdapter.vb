@@ -53,6 +53,8 @@ Public Class SelectionAdapter
                 RaiseEvent Commit()
             Case Input.Key.Escape
                 RaiseEvent Cancel()
+            Case Input.Key.Tab
+                RaiseEvent Commit()
         End Select
     End Sub
 

@@ -293,7 +293,7 @@ Public Class AutoCompleteTextBox
         Dim act As AutoCompleteTextBox
         act = TryCast(d, AutoCompleteTextBox)
         If act IsNot Nothing Then
-            If act.Editor IsNot Nothing Then
+            If act.Editor IsNot Nothing And Not act._isUpdatingText Then
                 act._isUpdatingText = True
                 act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue)
                 act._isUpdatingText = False
@@ -335,6 +335,7 @@ Public Class AutoCompleteTextBox
         End If
         FetchTimer.IsEnabled = False
         FetchTimer.Stop()
+        SetSelectedItem(Nothing)
         If Editor.Text.Length > 0 Then
             IsLoading = True
             IsDropDownOpen = True
@@ -372,6 +373,7 @@ Public Class AutoCompleteTextBox
         SelectedItem = ItemsSelector.SelectedItem
         _isUpdatingText = True
         Editor.Text = GetDisplayText(ItemsSelector.SelectedItem)
+        SetSelectedItem(ItemsSelector.SelectedItem)
         _isUpdatingText = False
         IsDropDownOpen = False
     End Sub
@@ -388,6 +390,11 @@ Public Class AutoCompleteTextBox
         _isUpdatingText = False
     End Sub
 
+    Private Sub SetSelectedItem(item As Object)
+        _isUpdatingText = True
+        SelectedItem = item
+        _isUpdatingText = False
+    End Sub
 #End Region 'Methods
 
 #Region "Nested Types"
@@ -423,9 +430,12 @@ Public Class AutoCompleteTextBox
             If _filter <> filter Then
                 Return
             End If
-            _actb.IsLoading = False
-            _actb.ItemsSelector.ItemsSource = suggestions
-            _actb.IsDropDownOpen = _actb.ItemsSelector.HasItems
+            If _actb.IsDropDownOpen Then
+                _actb.IsLoading = False
+                _actb.ItemsSelector.ItemsSource = suggestions
+                _actb.IsDropDownOpen = _actb.ItemsSelector.HasItems
+            End If
+            
         End Sub
 
         Private Sub GetSuggestionsAsync(ByVal param As Object)

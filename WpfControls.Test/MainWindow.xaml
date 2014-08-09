@@ -35,13 +35,19 @@
         <wpf:AutoCompleteTextBox VerticalAlignment="Top"
                                  Height="25"
                                  Grid.Column="1"
-                                 SelectedItem="{Binding Path=SelectedPath, Mode=TwoWay}"
                                  DisplayMember="FullName"
                                  ItemTemplate="{StaticResource ResourceKey=fsTemplate}"
                                  Watermark="Search here"
                                  IconPlacement="Left"
                                  IconVisibility="Visible"
                                  Provider="{StaticResource ResourceKey=fsp}">
+            <wpf:AutoCompleteTextBox.SelectedItem>
+                <Binding Path="SelectedPath" Mode="TwoWay">
+                    <Binding.ValidationRules>
+                        <local:RequiredValidationRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </wpf:AutoCompleteTextBox.SelectedItem>
             <wpf:AutoCompleteTextBox.LoadingContent>
                 <TextBlock Text="Loading..."
                            Margin="5"

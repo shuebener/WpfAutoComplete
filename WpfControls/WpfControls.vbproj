@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Editors\AutoCompleteTextBox\AutoCompleteTextBox.vb" />
     <Compile Include="Editors\AutoCompleteTextBox\BindingEvaluator.vb" />
+    <Compile Include="Editors\AutoCompleteTextBox\IconPlacement.vb" />
     <Compile Include="Editors\AutoCompleteTextBox\ISuggestionProvider.vb" />
     <Compile Include="Editors\AutoCompleteTextBox\SelectionAdapter.vb" />
     <Compile Include="Editors\AutoCompleteTextBox\SuggestionProvider.vb" />
