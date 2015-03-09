@@ -46,8 +46,9 @@
         private Selector _itemsSelector;
         private Popup _popup;
         private SelectionAdapter _selectionAdapter;
-
         private SuggestionsAdapter _suggestionsAdapter;
+        private bool _selectionCancelled;
+
         #endregion
 
         #region "Constructors"
@@ -276,7 +277,10 @@
         {
             if (SelectionAdapter != null)
             {
-                SelectionAdapter.HandleKeyDown(e);
+                if (IsDropDownOpen)
+                    SelectionAdapter.HandleKeyDown(e);
+                else
+                    IsDropDownOpen = e.Key == Key.Down || e.Key == Key.Up;
             }
         }
 
@@ -332,25 +336,40 @@
 
         private void OnPopupClosed(object sender, EventArgs e)
         {
+            if (!_selectionCancelled)
+            {
+                OnSelectionAdapterCommit();
+            }
         }
 
         private void OnPopupOpened(object sender, EventArgs e)
         {
+            _selectionCancelled = false;
+            ItemsSelector.SelectedItem = SelectedItem;
         }
 
         private void OnSelectionAdapterCancel()
         {
+            _isUpdatingText = true;
+            Editor.Text = SelectedItem == null ? Filter : GetDisplayText(SelectedItem);
+            Editor.SelectionStart = Editor.Text.Length;
+            Editor.SelectionLength = 0;
+            _isUpdatingText = false;
             IsDropDownOpen = false;
+            _selectionCancelled = true;
         }
 
         private void OnSelectionAdapterCommit()
         {
-            SelectedItem = ItemsSelector.SelectedItem;
-            _isUpdatingText = true;
-            Editor.Text = GetDisplayText(ItemsSelector.SelectedItem);
-            SetSelectedItem(ItemsSelector.SelectedItem);
-            _isUpdatingText = false;
-            IsDropDownOpen = false;
+            if (ItemsSelector.SelectedItem != null)
+            {
+                SelectedItem = ItemsSelector.SelectedItem;
+                _isUpdatingText = true;
+                Editor.Text = GetDisplayText(ItemsSelector.SelectedItem);
+                SetSelectedItem(ItemsSelector.SelectedItem);
+                _isUpdatingText = false;
+                IsDropDownOpen = false;
+            }
         }
 
         private void OnSelectionAdapterSelectionChanged()

@@ -59,12 +59,6 @@ namespace WpfControls.CS.Test
             set { _fileName = value; }
         }
 
-        public FileSystemInfo SelectedPath
-        {
-            get { return _selectedPath; }
-            set { _selectedPath = value; }
-        }
-
         public ICommand OpenCommand
         {
             get
@@ -77,6 +71,11 @@ namespace WpfControls.CS.Test
             }
         }
 
+        public FileSystemInfo SelectedPath
+        {
+            get { return _selectedPath; }
+            set { _selectedPath = value; RaisePropertyChanged("SelectedPath"); }
+        }
         #endregion
 
         #region "Methods"

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wpf="http://wpfcontrols.com/"
         xmlns:local="clr-namespace:WpfControls.CS.Test"
-        Title="Run" SizeToContent="WidthAndHeight"
+        Title="{Binding Path=SelectedItem.FullName, ElementName=Actb}" SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         Padding="10">
     <Window.Resources>
@@ -39,7 +39,8 @@
                                  Watermark="Search here"
                                  IconPlacement="Left"
                                  IconVisibility="Visible"
-                                 Provider="{StaticResource ResourceKey=fsp}">
+                                 Provider="{StaticResource ResourceKey=fsp}"
+                                 x:Name="Actb">
             <wpf:AutoCompleteTextBox.SelectedItem>
                 <Binding Path="SelectedPath" Mode="TwoWay">
                     <Binding.ValidationRules>
