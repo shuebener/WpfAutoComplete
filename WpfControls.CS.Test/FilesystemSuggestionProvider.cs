@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.IO;
     using WpfControls.Editors;
+    using System.Linq;
+    using System.Threading;
+
     public class FilesystemSuggestionProvider : ISuggestionProvider
     {
 
@@ -33,8 +36,8 @@
                 dirFilter = filter.Substring(index + 1) + "*";
             }
             DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
-            lst.AddRange(dirInfo.GetFileSystemInfos(dirFilter));
-            System.Threading.Thread.Sleep(2000);
+            lst.AddRange(dirInfo.GetDirectories(dirFilter));
+            lst.AddRange(dirInfo.GetFiles(dirFilter));
             return lst;
         }
 

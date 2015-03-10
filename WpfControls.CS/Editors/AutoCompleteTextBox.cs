@@ -32,6 +32,7 @@
         public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register("IsLoading", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
         public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
         public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty ItemTemplateSelectorProperty = DependencyProperty.Register("ItemTemplateSelector", typeof(DataTemplateSelector), typeof(AutoCompleteTextBox));
         public static readonly DependencyProperty LoadingContentProperty = DependencyProperty.Register("LoadingContent", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
         public static readonly DependencyProperty ProviderProperty = DependencyProperty.Register("Provider", typeof(ISuggestionProvider), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null, OnSelectedItemChanged));
@@ -39,16 +40,26 @@
 
         public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
         private BindingEvaluator _bindingEvaluator;
+
         private TextBox _editor;
+
         private DispatcherTimer _fetchTimer;
+
         private string _filter;
+
         private bool _isUpdatingText;
+
         private Selector _itemsSelector;
+
         private Popup _popup;
+
         private SelectionAdapter _selectionAdapter;
-        private SuggestionsAdapter _suggestionsAdapter;
+
         private bool _selectionCancelled;
 
+        private SuggestionsAdapter _suggestionsAdapter;
+
+        
         #endregion
 
         #region "Constructors"
@@ -155,6 +166,12 @@
             set { SetValue(ItemTemplateProperty, value); }
         }
 
+        public DataTemplateSelector ItemTemplateSelector
+        {
+            get { return ((DataTemplateSelector)(GetValue(AutoCompleteTextBox.ItemTemplateSelectorProperty))); }
+            set { SetValue(AutoCompleteTextBox.ItemTemplateSelectorProperty, value); }
+        }
+
         public object LoadingContent
         {
             get { return GetValue(LoadingContentProperty); }
@@ -219,6 +236,13 @@
                     act._isUpdatingText = false;
                 }
             }
+        }
+
+        private void ScrollToSelectedItem()
+        {
+            ListBox listBox = ItemsSelector as ListBox;
+            if (listBox != null && listBox.SelectedItem != null)
+                listBox.ScrollIntoView(listBox.SelectedItem);
         }
 
         public override void OnApplyTemplate()
@@ -385,6 +409,7 @@
             }
             Editor.SelectionStart = Editor.Text.Length;
             Editor.SelectionLength = 0;
+            ScrollToSelectedItem();
             _isUpdatingText = false;
         }
 

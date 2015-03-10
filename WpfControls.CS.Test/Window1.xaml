@@ -8,15 +8,63 @@
         Padding="10">
     <Window.Resources>
         <local:FilesystemSuggestionProvider x:Key="fsp" />
+        <local:FileIconConverter x:Key="FileIconConverter"/>
         <DataTemplate x:Key="fsTemplate">
             <Border Padding="5">
-                <StackPanel Orientation="Vertical">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.RowSpan="2"
+                           Width="32"
+                           Height="32"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Source="{Binding Converter={StaticResource FileIconConverter}}"/>
                     <TextBlock Text="{Binding Path=Name}"
-                               FontWeight="Bold" />
-                    <TextBlock Text="{Binding Path=LastWriteTime, StringFormat='Last Modified: {0}'}" />
-                </StackPanel>
+                               FontWeight="Bold" 
+                               Grid.Column="1" 
+                               Grid.Row="0"
+                               FontFamily="Segoe UI"
+                               VerticalAlignment="Bottom"/>
+                    <TextBlock Text="{Binding Path=LastWriteTime, StringFormat='Last Modified: {0}'}"
+                               Grid.Column="1"
+                               Grid.Row="1"
+                               VerticalAlignment="Top"/>
+                </Grid>
             </Border>
         </DataTemplate>
+        <DataTemplate x:Key="dirTemplate">
+            <Border Padding="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Image Width="32"
+                           Height="32"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Source="{Binding Converter={StaticResource FileIconConverter}}"/>
+                    <TextBlock Text="{Binding Path=Name}"
+                               FontWeight="SemiBold" 
+                               Grid.Column="1" 
+                               Grid.Row="0"
+                               FontFamily="Segoe UI"
+                               FontSize="14"
+                               VerticalAlignment="Center"/>
+                    
+                </Grid>
+            </Border>
+        </DataTemplate>
+        <local:CustomTemplateSelector x:Key="CustomTemplateSelector"
+                                      FileTemplate="{StaticResource fsTemplate}"
+                                      DirectoryTemplate="{StaticResource dirTemplate}"/>
     </Window.Resources>
     <Grid Width="400"
           Margin="20"
@@ -35,7 +83,7 @@
                                  Height="25"
                                  Grid.Column="1"
                                  DisplayMember="FullName"
-                                 ItemTemplate="{StaticResource ResourceKey=fsTemplate}"
+                                 ItemTemplateSelector="{StaticResource CustomTemplateSelector}"
                                  Watermark="Search here"
                                  IconPlacement="Left"
                                  IconVisibility="Visible"
