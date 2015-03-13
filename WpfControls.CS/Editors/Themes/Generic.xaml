@@ -56,11 +56,15 @@
     <Style TargetType="{x:Type local:AutoCompleteTextBox}">
         <Setter Property="Focusable"
                 Value="False" />
+        <Setter Property="IsTabStop" 
+                Value="True"/>
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="BorderBrush"
                 Value="Gray" />
         <Setter Property="Validation.ErrorTemplate" 
+                Value="{x:Null}"/>
+        <Setter Property="FocusVisualStyle"
                 Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -86,6 +90,8 @@
                                     <TextBox x:Name="PART_Editor"
                                              HorizontalAlignment="Stretch"
                                              VerticalAlignment="Center"
+                                             Focusable="True"
+                                             TabIndex="{TemplateBinding TabIndex}"
                                              Style="{StaticResource ResourceKey=TransparentTextBoxStyle}"
                                              Text="{Binding Path=Text, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=TwoWay}" />
                                 </Grid>
