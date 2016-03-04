@@ -11,7 +11,6 @@
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(string), typeof(BindingEvaluator), new FrameworkPropertyMetadata(string.Empty));
 
-        private Binding _valueBinding;
         #endregion
 
         #region "Constructors"
@@ -32,11 +31,7 @@
             set { SetValue(ValueProperty, value); }
         }
 
-        public Binding ValueBinding
-        {
-            get { return _valueBinding; }
-            set { _valueBinding = value; }
-        }
+        public Binding ValueBinding { get; set; }
 
         #endregion
 
@@ -44,7 +39,7 @@
 
         public string Evaluate(object dataItem)
         {
-            this.DataContext = dataItem;
+            DataContext = dataItem;
             SetBinding(ValueProperty, ValueBinding);
             return Value;
         }

@@ -6,9 +6,9 @@
     public class DelegateCommand : ICommand
     {
 
-        private Action<object> _executeMethod;
+        private readonly Action<object> _executeMethod;
 
-        private Func<object, bool> _canExecuteMethod;
+        private readonly Func<object, bool> _canExecuteMethod;
         public DelegateCommand(Action<object> executeMethod, Func<object, bool> canExecuteMethod)
         {
             if (executeMethod == null)

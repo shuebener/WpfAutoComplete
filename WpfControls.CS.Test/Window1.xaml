@@ -3,13 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wpf="http://wpfcontrols.com/"
         xmlns:local="clr-namespace:WpfControls.CS.Test"
-        Title="{Binding Path=SelectedItem.FullName, ElementName=Actb}" SizeToContent="WidthAndHeight"
+        xmlns:io="clr-namespace:System.IO;assembly=mscorlib"
+        Title="{Binding Path=SelectedItem.(io:FileSystemInfo.FullName), ElementName=Actb}" SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
-        Padding="10">
+        Padding="10"
+        FocusManager.FocusedElement="{Binding ElementName=Actb}">
     <Window.Resources>
-        <local:FilesystemSuggestionProvider x:Key="fsp" />
-        <local:FileIconConverter x:Key="FileIconConverter"/>
-        <DataTemplate x:Key="fsTemplate">
+        <local:FilesystemSuggestionProvider x:Key="FileSystemSuggestionProvider" />
+        <local:FileIconConverter x:Key="FileIconConverter" />
+        <DataTemplate x:Key="FileInfoTemplate" DataType="io:FileInfo">
             <Border Padding="5">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -39,7 +41,7 @@
                 </Grid>
             </Border>
         </DataTemplate>
-        <DataTemplate x:Key="dirTemplate">
+        <DataTemplate x:Key="DirectoryInfoTemplate" DataType="io:DirectoryInfo">
             <Border Padding="5">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -63,8 +65,8 @@
             </Border>
         </DataTemplate>
         <local:CustomTemplateSelector x:Key="CustomTemplateSelector"
-                                      FileTemplate="{StaticResource fsTemplate}"
-                                      DirectoryTemplate="{StaticResource dirTemplate}"/>
+                                      FileTemplate="{StaticResource FileInfoTemplate}"
+                                      DirectoryTemplate="{StaticResource DirectoryInfoTemplate}"/>
     </Window.Resources>
     <Grid Width="400"
           Margin="20"
@@ -81,13 +83,13 @@
         <Label Content="_Open" />
         <wpf:AutoCompleteTextBox VerticalAlignment="Top"
                                  Height="25"
-                                 Grid.Column="1"
+                                 Grid.Row="0" Grid.Column="1"
                                  DisplayMember="FullName"
                                  ItemTemplateSelector="{StaticResource CustomTemplateSelector}"
                                  Watermark="Search here"
                                  IconPlacement="Left"
                                  IconVisibility="Visible"
-                                 Provider="{StaticResource ResourceKey=fsp}"
+                                 Provider="{StaticResource ResourceKey=FileSystemSuggestionProvider}"
                                  x:Name="Actb">
             <wpf:AutoCompleteTextBox.SelectedItem>
                 <Binding Path="SelectedPath" Mode="TwoWay">

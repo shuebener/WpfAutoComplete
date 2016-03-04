@@ -10,8 +10,6 @@
 
         #region "Fields"
 
-
-        private Selector _selectorControl;
         #endregion
 
         #region "Constructors"
@@ -39,11 +37,7 @@
 
         #region "Properties"
 
-        public Selector SelectorControl
-        {
-            get { return _selectorControl; }
-            set { _selectorControl = value; }
-        }
+        public Selector SelectorControl { get; set; }
 
         #endregion
 

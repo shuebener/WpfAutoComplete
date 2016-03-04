@@ -2,12 +2,7 @@
 
 namespace WpfControls.CS.Test
 {
-
-    using Microsoft.VisualBasic;
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Data;
     using System.Diagnostics;
     using System.ComponentModel;
     using System.IO;
@@ -43,32 +38,22 @@ namespace WpfControls.CS.Test
 
         public ICommand CancelCommand
         {
-            get
-            {
-                if (_cancelCommand == null)
-                {
-                    _cancelCommand = new DelegateCommand(ExecuteCancelCommand, null);
-                }
-                return _cancelCommand;
-            }
+            get { return _cancelCommand ?? (_cancelCommand = new DelegateCommand(ExecuteCancelCommand, null)); }
         }
 
         public string FileName
         {
             get { return _fileName; }
-            set { _fileName = value; }
+            set
+            {
+                _fileName = value;
+                RaisePropertyChanged("FileName");
+            }
         }
 
         public ICommand OpenCommand
         {
-            get
-            {
-                if (_openCommand == null)
-                {
-                    _openCommand = new DelegateCommand(ExecuteOpenCommand, null);
-                }
-                return _openCommand;
-            }
+            get { return _openCommand ?? (_openCommand = new DelegateCommand(ExecuteOpenCommand, null)); }
         }
 
         public FileSystemInfo SelectedPath
@@ -76,6 +61,7 @@ namespace WpfControls.CS.Test
             get { return _selectedPath; }
             set { _selectedPath = value; RaisePropertyChanged("SelectedPath"); }
         }
+
         #endregion
 
         #region "Methods"
@@ -100,9 +86,9 @@ namespace WpfControls.CS.Test
                 Process.Start(SelectedPath.FullName);
                 Application.Current.Shutdown();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
         }
 

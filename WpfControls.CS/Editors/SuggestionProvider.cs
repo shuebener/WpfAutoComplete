@@ -3,13 +3,17 @@
 
     using System;
     using System.Collections;
+    /// <summary>
+    /// A generic suggestion provider. 
+    /// </summary>
+    /// <seealso cref="WpfControls.Editors.ISuggestionProvider" />
     public class SuggestionProvider : ISuggestionProvider
     {
 
 
         #region Private Fields
 
-        private Func<string, IEnumerable> _method;
+        private readonly Func<string, IEnumerable> _method;
 
         #endregion Private Fields
 
@@ -28,7 +32,7 @@
 
         #region Public Methods
 
-        public System.Collections.IEnumerable GetSuggestions(string filter)
+        public IEnumerable GetSuggestions(string filter)
         {
             return _method(filter);
         }

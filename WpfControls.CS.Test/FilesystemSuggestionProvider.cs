@@ -3,9 +3,7 @@
 
     using System.Collections.Generic;
     using System.IO;
-    using WpfControls.Editors;
-    using System.Linq;
-    using System.Threading;
+    using Editors;
 
     public class FilesystemSuggestionProvider : ISuggestionProvider
     {
@@ -26,16 +24,16 @@
                 return null;
             }
 
-            List<System.IO.FileSystemInfo> lst = new List<System.IO.FileSystemInfo>();
-            string dirFilter = "*";
-            string dirPath = filter;
+            var lst = new List<FileSystemInfo>();
+            var dirFilter = "*";
+            var dirPath = filter;
             if (!filter.EndsWith("\\"))
             {
-                int index = filter.LastIndexOf("\\");
+                var index = filter.LastIndexOf("\\", System.StringComparison.Ordinal);
                 dirPath = filter.Substring(0, index + 1);
                 dirFilter = filter.Substring(index + 1) + "*";
             }
-            DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
+            var dirInfo = new DirectoryInfo(dirPath);
             lst.AddRange(dirInfo.GetDirectories(dirFilter));
             lst.AddRange(dirInfo.GetFiles(dirFilter));
             return lst;

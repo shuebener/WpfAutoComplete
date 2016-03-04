@@ -8,8 +8,8 @@
 
         public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
         {
-            ValidationResult result = new ValidationResult(true, null);
-            if (value == null || object.ReferenceEquals(value, DBNull.Value))
+            var result = new ValidationResult(true, null);
+            if (value == null || ReferenceEquals(value, DBNull.Value))
             {
                 result = new ValidationResult(false, "Required!");
             }

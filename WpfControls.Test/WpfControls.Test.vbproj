@@ -162,12 +162,6 @@
     <AppDesigner Include="My Project\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WpfControls\WpfControls.vbproj">
-      <Project>{D010F52C-140C-410D-B897-C1091B81AA13}</Project>
-      <Name>WpfControls</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\search_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
