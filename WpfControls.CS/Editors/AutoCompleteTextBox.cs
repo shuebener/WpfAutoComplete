@@ -44,7 +44,7 @@
 
         public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        private bool _isUpdatingText;
+		private bool _isUpdatingText;
 
         private bool _selectionCancelled;
 
@@ -305,8 +305,10 @@
                 {
                     act._isUpdatingText = true;
                     act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue);
-                    act._isUpdatingText = false;
-                }
+					act.RaiseItemSelectedEvent(e.OldValue, e.NewValue);
+					act._isUpdatingText = false;					
+
+				}
             }
         }
 
@@ -429,7 +431,9 @@
             if (Provider != null && ItemsSelector != null)
             {
                 Filter = Editor.Text;
-                if (_suggestionsAdapter == null)
+				RaiseEditorTextChangedEvent(Editor.Text);
+
+				if (_suggestionsAdapter == null)
                 {
                     _suggestionsAdapter = new SuggestionsAdapter(this);
                 }
@@ -457,7 +461,7 @@
             Editor.Text = SelectedItem == null ? Filter : GetDisplayText(SelectedItem);
             Editor.SelectionStart = Editor.Text.Length;
             Editor.SelectionLength = 0;
-            _isUpdatingText = false;
+			_isUpdatingText = false;
             IsDropDownOpen = false;
             _selectionCancelled = true;
         }
@@ -470,7 +474,7 @@
                 _isUpdatingText = true;
                 Editor.Text = GetDisplayText(ItemsSelector.SelectedItem);
                 SetSelectedItem(ItemsSelector.SelectedItem);
-                _isUpdatingText = false;
+				_isUpdatingText = false;
                 IsDropDownOpen = false;
             }
         }
@@ -482,20 +486,73 @@
             Editor.SelectionStart = Editor.Text.Length;
             Editor.SelectionLength = 0;
             ScrollToSelectedItem();
-            _isUpdatingText = false;
+			_isUpdatingText = false;
         }
 
         private void SetSelectedItem(object item)
         {
             _isUpdatingText = true;
             SelectedItem = item;
-            _isUpdatingText = false;
+			_isUpdatingText = false;
         }
-        #endregion
+		#endregion
 
-        #region "Nested Types"
+		#region Item selected event
+		/// <summary>
+		/// Suggested item selected event.
+		/// </summary>
+		public static readonly RoutedEvent ItemSelectedEvent = EventManager.RegisterRoutedEvent("ItemSelected", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(AutoCompleteTextBox));		
 
-        private class SuggestionsAdapter
+		/// <summary>
+		/// Suggested item selected event.
+		/// </summary>
+		public event RoutedEventHandler ItemSelected
+		{
+			add { AddHandler(ItemSelectedEvent, value); }
+			remove { RemoveHandler(ItemSelectedEvent, value); }
+		}
+
+		private void RaiseItemSelectedEvent(object OldValue, object NewValue)
+		{
+			var newEventArgs = new ItemSelectedEventArgs(ItemSelectedEvent)
+			{
+				OldValue = OldValue,
+				NewValue = NewValue
+			};
+
+			RaiseEvent(newEventArgs);
+		}
+		#endregion
+
+		#region EditorTextChanged event
+		/// <summary>
+		/// Editor text changed event.
+		/// </summary>
+		public static readonly RoutedEvent EditorTextChangedEvent = EventManager.RegisterRoutedEvent("EditorTextChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(AutoCompleteTextBox));
+
+		/// <summary>
+		/// Editor text changed event.
+		/// </summary>
+		public event RoutedEventHandler EditorTextChanged
+		{
+			add { AddHandler(EditorTextChangedEvent, value); }
+			remove { RemoveHandler(EditorTextChangedEvent, value); }
+		}
+
+		private void RaiseEditorTextChangedEvent(string Text)
+		{
+			var newEventArgs = new EditorTextChangedEventArgs(EditorTextChangedEvent)
+			{
+				Text = Text
+			};
+
+			RaiseEvent(newEventArgs);
+		}
+		#endregion
+
+		#region "Nested Types"
+
+		private class SuggestionsAdapter
         {
 
             #region "Fields"
@@ -565,4 +622,73 @@
 
     }
 
+	/// <summary>
+	/// Contains state information and event data associated with an ItemSelected event.
+	/// </summary>
+	public class ItemSelectedEventArgs : RoutedEventArgs
+	{
+		/// <summary>
+		/// The last selected item.
+		/// </summary>
+		public object OldValue { get; set; }
+		/// <summary>
+		/// The new selected item.
+		/// </summary>
+		public object NewValue { get; set; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ItemSelectedEventArgs"/> class.
+		/// </summary>
+		public ItemSelectedEventArgs() : base() { }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ItemSelectedEventArgs"/> class, using
+		/// the supplied routed event identifier.
+		/// </summary>
+		/// <param name="routedEvent">The routed event identifier for this instance of the <see cref="ItemSelectedEventArgs"/> class.</param>
+		public ItemSelectedEventArgs(RoutedEvent routedEvent) : base(routedEvent) { }
+		/// <summary>
+		/// Initializes a new instance of the System.Windows.RoutedEventArgs class, using
+		/// the supplied routed event identifier, and providing the opportunity to declare
+		/// a different source for the event.
+		/// </summary>
+		/// <param name="routedEvent"> The routed event identifier for this instance of the <see cref="ItemSelectedEventArgs"/> class.</param>
+		/// <param name="source">
+		/// An alternate source that will be reported when the event is handled. This pre-populates
+		/// the <see cref="RoutedEventArgs.Source"/> property.
+		/// </param>
+		public ItemSelectedEventArgs(RoutedEvent routedEvent, object source) : base(routedEvent, source) { }
+	}
+
+	/// <summary>
+	/// Contains state information and event data associated with an TextChanged event.
+	/// </summary>
+	public class EditorTextChangedEventArgs : RoutedEventArgs
+	{
+		/// <summary>
+		/// The new text string.
+		/// </summary>
+		public string Text { get; set; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorTextChangedEventArgs"/> class.
+		/// </summary>
+		public EditorTextChangedEventArgs() : base() { }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorTextChangedEventArgs"/> class, using
+		/// the supplied routed event identifier.
+		/// </summary>
+		/// <param name="routedEvent">The routed event identifier for this instance of the <see cref="EditorTextChangedEventArgs"/> class.</param>
+		public EditorTextChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent) { }
+		/// <summary>
+		/// Initializes a new instance of the System.Windows.RoutedEventArgs class, using
+		/// the supplied routed event identifier, and providing the opportunity to declare
+		/// a different source for the event.
+		/// </summary>
+		/// <param name="routedEvent"> The routed event identifier for this instance of the <see cref="EditorTextChangedEventArgs"/> class.</param>
+		/// <param name="source">
+		/// An alternate source that will be reported when the event is handled. This pre-populates
+		/// the <see cref="RoutedEventArgs.Source"/> property.
+		/// </param>
+		public EditorTextChangedEventArgs(RoutedEvent routedEvent, object source) : base(routedEvent, source) { }
+	}
 }
