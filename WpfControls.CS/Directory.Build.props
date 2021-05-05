@@ -1,0 +1,20 @@
+<Project>
+	<PropertyGroup>		
+		<Authors>SCHMID Group | Gebr. SCHMID GmbH</Authors>
+		<Company>SCHMID Group | Gebr. SCHMID GmbH</Company>
+		<Product>WpfControls</Product>
+		<Description>A collection of WPF controls.</Description>
+		<Copyright>Copyright © 2021 - SCHMID Group | Gebr. SCHMID GmbH</Copyright>		
+		<PackageProjectUrl>https://schmid-group.com</PackageProjectUrl>
+	</PropertyGroup>
+	
+	<PropertyGroup>		
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>		
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/shuebener/WpfAutoComplete</RepositoryUrl>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EmbedAllSources>true</EmbedAllSources>
+	</PropertyGroup>
+</Project>
